@@ -5,10 +5,9 @@ export type INavLink = {
   };
   
   export type IUpdateUser = {
-    userId: string;
+    id: any;
     name: string;
     bio: string;
-    imageId: string;
     profile_photo_url: URL | string;
     file: File[];
   };

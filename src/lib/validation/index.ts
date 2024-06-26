@@ -20,12 +20,10 @@ export const PostValidation = z.object({
     tags: z.string(),
 });
 
-// export const PostValidation = z.object({
-//     caption: z.string().min(1, "Caption is required"),
-//     file: z
-//       .array(z.any())
-//       .min(1, "File is required")
-//       .nonempty("File is required"),
-//     location: z.string().min(1, "Location is required"),
-//     tags: z.string(),
-//   });
+export const ProfileValidation = z.object({
+    file: z.custom<File[]>(),
+    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+    username: z.string().min(2, { message: "Name must be at least 2 characters." }),
+    email: z.string().email(),
+    bio: z.string(),
+});

@@ -1,55 +1,72 @@
-import { useEffect } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useLogoutAccount } from "@/lib/react-query/queries";
-import { useUserContext } from "@/context/AuthContext";
+import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { sidebarLinks } from "@/constants";
 import { INavLink } from "@/types";
 import { Button } from "../ui/button";
+import Loader from "./Loader";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
-  const { pathName } = useLocation();
-  const { user } = useUserContext();
-  const { mutateAsync: logoutAccount, isSuccess } = useLogoutAccount();
+  const { pathname } = useLocation();
+  const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
+  const { mutateAsync: logoutAccount } = useLogoutAccount();
+
+  // console.log(user);
+
+  const handleLogout = async(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    logoutAccount();
+    setIsAuthenticated(false);
+    setUser(INITIAL_USER);
+    navigate("/sign-in");
+  }
 
 
-  useEffect(() => {
-    if (isSuccess) navigate(0);
-  }, [isSuccess, navigate]);
   return (
     <nav className="leftsidebar">
       <div className="flex flex-col gap-11">
         <Link to="/" className="flex gap-3 items-center">
           <img
-            src="/assets/images/logo.svg"
+            src="/assets/images/logo2.svg"
             alt="logo"
             width={170}
             height={36}
           />
         </Link>
-        <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
-          <img
-            src={user.profile_photo_url}
-            alt="profile"
-            className="h-14 w-14 rounded-full"
-          />
-          <div className="flex flex-col">
-            <p className="body-bold">{user.name}</p>
-            <p className="small-regular text-light-3">
-              @{user.username}
-            </p>
+
+        {isLoading || !user.email ? (
+          <div className="h-14">
+            <Loader />
           </div>
-        </Link>
+        ) : (
+          <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
+            <img
+              src={user.profile_photo_url || "/assets/icons/profile-placeholder.svg"}
+              alt="profile"
+              className="h-14 w-14 rounded-full"
+            />
+            <div className="flex flex-col">
+              <p className="body-bold">{user.name}</p>
+              <p className="small-regular text-light-3">@{user.username}</p>
+            </div>
+          </Link>
+        )}
+
         <ul className="flex flex-col gap-6">
-          {sidebarLinks.map((link:INavLink) => {
-
-            const isActive = pathName === link.route;
-
+          {sidebarLinks.map((link: INavLink) => {
+            const isActive = pathname === link.route;
 
             return (
-              <li key={link.label} className={`leftsidebar-link group ${isActive && "bg-primary-500"}`}>
-                <NavLink to={link.route} className="flex items-center gap-4 p-4">
-                <img
+              <li
+                key={link.label}
+                className={`leftsidebar-link group ${
+                  isActive && "bg-primary-500"
+                }`}>
+                <NavLink
+                  to={link.route}
+                  className="flex gap-4 items-center p-4">
+                  <img
                     src={link.imgURL}
                     alt={link.label}
                     className={`group-hover:invert-white ${
@@ -58,18 +75,16 @@ const LeftSidebar = () => {
                   />
                   {link.label}
                 </NavLink>
-                
               </li>
             );
           })}
-
         </ul>
       </div>
 
       <Button
         variant="ghost"
         className="shad-button_ghost"
-        onClick={() => {}}>
+        onClick={(e) => handleLogout(e)}>
         <img src="/assets/icons/logout.svg" alt="logout" />
         <p className="small-medium lg:base-medium">Logout</p>
       </Button>

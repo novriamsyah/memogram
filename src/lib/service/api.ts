@@ -1,6 +1,10 @@
-import { INewPost, INewUser } from "@/types";
+import { INewUser } from "@/types";
 import requestProcessor from "./request";
 
+
+// ============================================================
+// AUTH
+// ============================================================
 export const createUserAccount = async (user: INewUser) => {
   return await requestProcessor("POST", "/register", user);
 };
@@ -19,14 +23,6 @@ export const signInAccount = async (user: {
   }
 };
 
-export const getCurrentUser = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Token not found"); // Tangani jika token tidak ada
-  }
-  return requestProcessor("GET", "/me", null, token); // Sertakan token dalam permintaan
-};
-
 export const logoutAccount = async () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -35,6 +31,18 @@ export const logoutAccount = async () => {
   localStorage.removeItem("token"); // Hapus token dari localStorage saat logout
   return requestProcessor("POST", "/logout", null, token);
 };
+
+export const getCurrentUser = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Token not found"); // Tangani jika token tidak ada
+  }
+  return requestProcessor("GET", "/me", null, token); // Sertakan token dalam permintaan
+};
+
+// ============================================================
+// POSTS
+// ============================================================
 
 export const cretePost = async (post: FormData) => {
   try {
@@ -85,14 +93,6 @@ export async function savePost(postId:any) {
   }
 }
 
-export const getUserByLogedIn = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Token not found"); // Tangani jika token tidak ada
-  }
-  return requestProcessor("GET", "/user", null, token); // Sertakan token dalam permintaan
-};
-
 export const getPostById = (postId:any) => {
   try {
     const token = localStorage.getItem("token");
@@ -106,16 +106,14 @@ export const getPostById = (postId:any) => {
 }
 
 export const updatePost = async ({formData, postId} : { formData:FormData, postId:any }) => {
-  // console.log(post);
+  // for (let pair of formData.entries()) {
+  //   console.log(pair[0]+ ', ' + pair[1]); 
+  // }
   try {
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("Token not found");
     }
-
-    // for (var pair of formData.entries()) {
-    //   console.log(pair[0]+ ', ' + pair[1]); 
-    // }
     return requestProcessor("POST", `/post/${postId}/update`, formData, token, true);
   } catch (error) {
     console.log(error);
@@ -184,6 +182,34 @@ export const getSavedUserPosts = async () => {
   }
 }
 
+export const getLikedUserPosts = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not found");
+    }
+    return requestProcessor("GET", `user/posts/like`, null, token);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const deletePost = async (postId:any) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not found");
+    }
+    return requestProcessor("DELETE", `/posts/${postId}/delete`, null, token);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================================================
+// USER
+// ============================================================
+
 export const getallUsers = async (page = 1) => {
   try {
     const token = localStorage.getItem("token");
@@ -195,5 +221,40 @@ export const getallUsers = async (page = 1) => {
     console.log(error);
   }
 }
+
+export const getUserByLogedIn = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Token not found"); // Tangani jika token tidak ada
+  }
+  return requestProcessor("GET", "/user", null, token); // Sertakan token dalam permintaan
+};
+
+export const getUserById = (userId:any) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not found");
+    }
+    return requestProcessor("GET", `/user/${userId}`, null, token);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const updateUser = async (user:any) => {
+  // console.log(user);
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not found");
+    }
+    return requestProcessor("POST", `/users/${user.id}/profile`, user, token, true);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 
 

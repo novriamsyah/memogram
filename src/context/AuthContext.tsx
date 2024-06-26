@@ -50,8 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const currentAccount = await getCurrentUser();
 
-      // console.log(currentAccount.data);
-      if (currentAccount) {
+      // console.log(currentAccount.data.name);
+      if (currentAccount.data) {
         setUser({
           id: currentAccount.data.id,
           name: currentAccount.data.name,
@@ -69,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error(error);
       setIsAuthenticated(false);
+      localStorage.removeItem("token");
       return false;
     } finally {
       setIsLoading(false);
@@ -77,8 +78,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     const path = location.pathname; // Mendapatkan path saat ini
-  
+
     if (!token && path !== "/sign-up") {
       setIsAuthenticated(false);
       navigate("/sign-in");

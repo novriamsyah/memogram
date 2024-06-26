@@ -62,6 +62,8 @@ const PostForm = ({ post, action }: PostFormProps) => {
         }
         formData.append("userId", user.id.toString());
 
+        // console.log(values.image[0])
+
         const updatePost = await updatePostMut({formData, postId});
 
         if (!updatePost) {
